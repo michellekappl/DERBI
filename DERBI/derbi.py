@@ -15,16 +15,24 @@
 
 # import required modules
 import json
+import os
 import re
 import warnings
+from typing import Union
 # import spaCy
 import spacy
 # import required scripts
-# from DERBI import Tools, Inflectors
-import Tools, Inflectors
+try:
+    from DERBI import Tools, Inflectors
+except ImportError:
+    import Tools, Inflectors
+
+# Get package directory for relative paths
+_PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # Router contains information about 
 # __init__ of each pos inflector
-with open('./Router.json') as r:
+with open(os.path.join(_PACKAGE_DIR, 'Router.json')) as r:
     Router = json.load(r)
 
     
@@ -54,10 +62,11 @@ Wrapper performance consists of three stages:
 '''
 class DERBI:
 
-    def __init__(self, model: spacy.lang.de.German):
+    def __init__(self, model):
         # as the model uses spaCy, we require one of the German spaCy models;
         # any is accepted
-        if not isinstance(model, spacy.lang.de.German):
+        from spacy.lang.de import German
+        if not isinstance(model, German):
             raise TypeError('You should use one of the German spaCy pipelines: https://spacy.io/models/de')
         self.model = model
         # with TagsProcessor we will process the input tags (surprisingly!) 
@@ -65,6 +74,11 @@ class DERBI:
         # create an instance of inflector for each POS
         for pos, args in Router.items():
             inflector_name, fa_path, lexc_path = tuple(args)
+            # Convert relative paths to absolute paths
+            if fa_path is not None:
+                fa_path = os.path.join(_PACKAGE_DIR, fa_path.replace('./', ''))
+            if lexc_path is not None:
+                lexc_path = os.path.join(_PACKAGE_DIR, lexc_path.replace('./', ''))
             setattr(self, pos.lower() + '_inflector', getattr(Inflectors, inflector_name)(fa_path, lexc_path))
 
     def inflect(self, token: spacy.tokens.token.Token, target_tags: str) -> str:
@@ -117,10 +131,11 @@ class DERBI:
             delimitors.append(delimitor)
             text_ = re.sub(delimitor, '', text_, count=1)
             masks.append(cls.mask(pre))
+        masks.append(cls.mask(tokens[-1])) # last token!
         delimitors.append('')
         return delimitors, masks
 
-    def __call__(self, text: str, target_tags: dict or list=None, indices: int or list=0) -> str:
+    def __call__(self, text: str, target_tags: Union[dict, list]=None, indices: Union[int, list]=0) -> str:
         # check if the target tagsets and indices of to-be-inflected tokens were provided
         if isinstance(target_tags, dict):
 #             if not len(target_tags):

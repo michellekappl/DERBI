@@ -13,42 +13,28 @@
 # limitations under the License.
 # ************************************************************************
 
-import os, sys
-ROOT = os.path.dirname(__file__)
-depth = 0
-for _ in range(depth): ROOT = os.path.dirname(ROOT)
-sys.path.append(ROOT)
+import os
+
+# Get package directory for relative paths
+_PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # import required modules
 import json
-import os
 import re
 # import spaCy
 import spacy
 
 # in DERBI we need a compound splitter; we use dtuggener/CharSplit.
-# to access it, we first need do some manipulations:
-    # clone to folder 'Charsplit'
-# from git import Repo
-# if not os.path.exists('./CharSplit'):
-#     Repo.clone_from('https://github.com/dtuggener/CharSplit', 'CharSplit')
-    # in folder 'Charsplit' create an empty file '__init__.py' 
-    # for python to recognize the folder as a package
-# filepath = os.path.join('CharSplit', '__init__.py')
-# with open(filepath, 'w') as i:
-#     i.write('')
-#     # in file 'Charsplit/charsplit/__init__.py' we delete all the text
-#     # as running it, python throws an exception
-# filepath = os.path.join('CharSplit/charsplit', '__init__.py')
-# with open(filepath, 'w') as i:
-#     i.write('')
-    # finally import
-from CharSplit.charsplit.splitter import Splitter
+from charsplit import Splitter
 splitter = Splitter()
 
 # import required scripts
-# from DERBI import Tools
-import Tools
+try:
+    from DERBI import Tools
+except ImportError:
+    import Tools
+
+from typing import Union
 
 '''
 For each POS we have its own inflector (the list of correspondance can be found at
@@ -143,7 +129,7 @@ class ADJInflector(BasicInflector):
         # if not applicable, there is no umlaut
         return token.replace('#', '')
 
-    def __call__(self, token: spacy.tokens.token.Token or str, target_tags: str) -> str:
+    def __call__(self, token: Union[spacy.tokens.token.Token, str], target_tags: str) -> str:
         # from AUX and VERB we can receive <str> tokens
         # (when Verbform=Part),
         # so we must just pass the following part then
@@ -194,7 +180,7 @@ class AUXInflector(BasicInflector):
     def __init__(self, fa_path: str=None, lexc_path: str=None):
         super().__init__(fa_path, lexc_path)
         # ADJInflector for participles
-        self.adj_inflector = ADJInflector('./meta/automata/ADJ.fa')
+        self.adj_inflector = ADJInflector(os.path.join(_PACKAGE_DIR, 'meta/automata/ADJ.fa'))
 
     # strong german verbs toss an umlaut
     # when Mood=Sub, 
@@ -275,7 +261,7 @@ class NOUNInflector(BasicInflector):
     def __init__(self, fa_path: str=None, lexc_path: str=None):
         super().__init__(fa_path, lexc_path)
         # ADJInflector for nouns of adjective declination
-        self.adj_inflector = ADJInflector('./meta/automata/ADJ.fa')
+        self.adj_inflector = ADJInflector(os.path.join(_PACKAGE_DIR, 'meta/automata/ADJ.fa'))
 
     def __call__(self, token: spacy.tokens.token.Token, target_tags: str) -> str:        
         # adjective declination nouns
@@ -345,7 +331,7 @@ class VERBInflector(AUXInflector):
     def __init__(self, fa_path: str=None, lexc_path: str=None):
         super().__init__(fa_path, lexc_path)
         # we need to distinct between separable and inseparable prefixes
-        with open('./meta/lexicons/verb_prefixes.json') as j:
+        with open(os.path.join(_PACKAGE_DIR, 'meta/lexicons/verb_prefixes.json')) as j:
             self.prefixes = json.load(j)
 
     # split a verb into prefixes and non-prefix-part

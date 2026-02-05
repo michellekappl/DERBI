@@ -34,36 +34,37 @@ For the arguments, see [below](https://github.com/maxschmaltz/DERBI/blob/main/RE
 ## Installation
 
 ### Via pip
-```
+```bash
 pip install DERBI
 ```
 
 ### Via git clone
 
-Install all necessary packages:
-```python
-pip install -r requirements.txt
-```
 Clone DERBI:
-```python
+```bash
 git clone https://github.com/maxschmaltz/DERBI
 ```
-or
-```python
-from git import Repo
-Repo.clone_from('https://github.com/maxschmaltz/DERBI', 'DERBI')
+
+Install all necessary packages:
+```bash
+pip install -r requirements.txt
+```
+
+Finally, run the setup script:
+```bash
+pip install .
 ```
 
 ## Simple Usage
-Note that DERBI works with [spaCy](https://spacy.io). Make sure to have installed any of the [spaCy pipelines for German](https://spacy.io/models/de).
+Note that DERBI works with [spaCy](https://spacy.io). The requirements include `de_dep_news_trf`, the largest German spaCy model. You can also use any other [spaCy pipeline for German](https://spacy.io/models/de).
 
 ### Example
 
 ```python
-# python -m spacy download de_core_news_sm
-nlp = spacy.load('de_core_news_md')
+import spacy
+nlp = spacy.load('de_dep_news_trf')
 
-from DERBI.derbi import DERBI
+from DERBI import DERBI
 derbi = DERBI(nlp)
 
 derbi(

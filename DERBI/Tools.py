@@ -14,19 +14,24 @@
 # ************************************************************************
 
 # import required modules / functions
-from numpy import argmin
+import numpy as np
 from collections import defaultdict
 import json
+import os
 import re
 import warnings
+from typing import Optional
 # import spaCy
 import spacy
 
+# Get package directory for relative paths
+_PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # obtain required json data
-with open('./meta/LabelsScheme.json') as json_file:
+with open(os.path.join(_PACKAGE_DIR, 'meta/LabelsScheme.json')) as json_file:
     LabelsScheme = json.load(json_file)
     
-with open('./meta/ValidFeatures.json') as json_file:
+with open(os.path.join(_PACKAGE_DIR, 'meta/ValidFeatures.json')) as json_file:
     ValidFeatures = json.load(json_file)
 
 # json data links
@@ -70,7 +75,7 @@ class TagsSearcher:
     # secondary search checks partial match: if in label scheme there is such a tagset
     # that for each category-feature pair in it either the feature is in target tagset or 
     # the category is missing there
-    def secondary_search(self, morph: str, pos: str) -> None or str:
+    def secondary_search(self, morph: str, pos: str) -> Optional[str]:
         morph_tags = split_tags(morph)
         self.check_tags(morph_tags)
         pattern = re.compile('(\\||^)' + '\\|(\\w+=\\w+\\|)*'.join([cat + '=' + feat 
@@ -85,7 +90,7 @@ class TagsSearcher:
         # then if we found such a tagset, we want to set our 
         # target tagset's missing categories as default;
         # the default value for each category is [0] element of its list in ValidFeatures 
-        extract_min = lambda m: m[argmin([len(f.split('|')) for f in m])]
+        extract_min = lambda m: m[np.argmin([len(f.split('|')) for f in m])]
         res_tags = merge_tags({cat: (ValidFeatures[cat][0] if morph_tags.get(cat) is None 
                                      else morph_tags[cat]) for cat, feat in split_tags(extract_min(matches)).items()})
         warnings.warn('Provided tags were not found in labels scheme. Some features were set as default.\nResult features are "' +
