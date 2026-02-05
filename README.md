@@ -3,20 +3,22 @@
 
 DERBI (DEutscher RegelBasierter Inflektor) is a simple rule-based automatic inflection model for German based on [spaCy](https://spacy.io). <br> Applicable regardless of POS!
 
+This repository is forked from [Max Schmaltz's DERBI](https://github.com/maxschmaltz/DERBI) and includes modifications and bug fixes. The original README is available [here](https://github.com/maxschmaltz/DERBI/blob/main/README.md). All changes can be found in the [Modifications](#modifications) section below.
+
 ---
 
 ### Table of Contents
-* [How It Works](https://github.com/maxschmaltz/DERBI/edit/main/README.md#how-it-works)
-* [Installation](https://github.com/maxschmaltz/DERBI/edit/main/README.md#installation)
-  * [Via pip](https://github.com/maxschmaltz/DERBI/blob/main/README.md#via-pip)
-  * [Via git clone](https://github.com/maxschmaltz/DERBI/blob/main/README.md#via-git-clone)
-* [Simple Usage](https://github.com/maxschmaltz/DERBI/edit/main/README.md#simple-usage)
-  * [Example](https://github.com/maxschmaltz/DERBI/blob/main/README.md#example)
-  * [Arguments](https://github.com/maxschmaltz/DERBI/blob/main/README.md#arguments)
-  * [Output](https://github.com/maxschmaltz/DERBI/blob/main/README.md#output)
-* [Tags](https://github.com/maxschmaltz/DERBI/blob/main/README.md#tags)
-* [Performance](https://github.com/maxschmaltz/DERBI/blob/main/README.md#performance)
-* [License](https://github.com/maxschmaltz/DERBI/blob/main/README.md#license)
+* [How It Works](https://github.com/michellekappl/DERBI/edit/main/README.md#how-it-works)
+* [Installation](https://github.com/michellekappl/DERBI/edit/main/README.md#installation)
+  * [Via pip](https://github.com/michellekappl/DERBI/blob/main/README.md#via-pip)
+  * [Via git clone](https://github.com/michellekappl/DERBI/blob/main/README.md#via-git-clone)
+* [Simple Usage](https://github.com/michellekappl/DERBI/edit/main/README.md#simple-usage)
+  * [Example](https://github.com/michellekappl/DERBI/blob/main/README.md#example)
+  * [Arguments](https://github.com/michellekappl/DERBI/blob/main/README.md#arguments)
+  * [Output](https://github.com/michellekappl/DERBI/blob/main/README.md#output)
+* [Tags](https://github.com/michellekappl/DERBI/blob/main/README.md#tags)
+* [Performance](https://github.com/michellekappl/DERBI/blob/main/README.md#performance)
+* [License](https://github.com/michellekappl/DERBI/blob/main/README.md#license)
 
 ---
 
@@ -29,7 +31,7 @@ DERBI (DEutscher RegelBasierter Inflektor) is a simple rule-based automatic infl
    - The words with the result features come through the rules and get inflected;
 4. The result is assembled into the output. 
 
-For the arguments, see [below](https://github.com/maxschmaltz/DERBI/blob/main/README.md#arguments). 
+For the arguments, see [below](https://github.com/michellekappl/DERBI/blob/main/README.md#arguments). 
 
 ## Installation
 
@@ -42,7 +44,7 @@ pip install DERBI
 
 Clone DERBI:
 ```bash
-git clone https://github.com/maxschmaltz/DERBI
+git clone https://github.com/michellekappl/DERBI.git
 ```
 
 Install all necessary packages:
@@ -171,6 +173,18 @@ test0.main()
 ```
 
 Notice that performance might vary depending on the dataset. Also remember, that if spaCy might make mistakes predicting (that means, that in some cases DERBI inflection is correct but does not correspond spaCy's tags), which also affects evaluation. 
+
+## Modifications
+
+This fork includes the following changes:
+
+- **Token mask fix**: Fixed an issue with token masking in `derbi.py` (`get_delimiters` function) that caused incorrect behavior during text processing
+- **Proper package installation**: Fixed setup configuration to allow proper installation via `pip install .`
+- **Updated dependencies**: Updated all requirements to their newest compatible versions:
+  - `nltk`: 3.9.2
+  - `numpy`: 2.2.6
+  - `spacy`: 3.8.11
+
 
 ## License
 
